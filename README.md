@@ -1,15 +1,12 @@
-
-
-<p align="center">
-  <img src="assests/Logo.png" alt="Pokedex Logo" width="200"/>
-</p>
-
 <p align="center">
   <img src="assests/Banner.jpeg" alt="Pokedex Banner" width="100%" style="border-radius: 20px;"/>
-  <
+  
 </p>
 
-# Pokedex App 🎮
+<div style="display:flex; align-items:center; gap:12px;">
+    <img src="assests/Symbol.png" alt="Pokemon_Logo" width="70" style="display:block;"/>
+    <h1 style="margin:0;">Pokedex App </h1>
+</div>
 
 A beautiful and modern Flutter application that allows users to browse and
 search Pokemon using the [PokeAPI](https://pokeapi.co/).
@@ -194,5 +191,3 @@ details.
 - GitHub: [@itumelengseema](https://github.com/itumelengseema)
 
 ---
-
-
