@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pokedex_app/controllers/pokemon_controller.dart';
 import 'package:pokedex_app/models/pokemon.dart';
+import 'package:pokedex_app/views/widgets/pokemon_card.dart';
 import 'package:pokedex_app/views/widgets/search_bar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -57,6 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   SizedBox(height: 16),
                   PokemonSearchBar(),
+                  SizedBox(height: 16),
+                  PokemonCard(),
                 ],
               ),
             ),
