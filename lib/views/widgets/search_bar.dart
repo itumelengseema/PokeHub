@@ -15,12 +15,22 @@ class _PokemonSearchBarState extends State<PokemonSearchBar> {
         Expanded(
           child: TextField(
             decoration: InputDecoration(
+              hintText: 'Search favorites...',
+              prefixIcon: Icon(Icons.search),
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: () {
+                        _searchController.clear();
+                      },
+                    )
+                  : null,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                borderRadius: BorderRadius.circular(12),
               ),
-              hintText: 'Search Pokemon',
+              filled: true,
+              fillColor: Colors.grey[100],
             ),
-            onSubmitted: (value) {},
           ),
         ),
         SizedBox(width: 8),
@@ -39,7 +49,7 @@ class _PokemonSearchBarState extends State<PokemonSearchBar> {
             splashRadius: 28,
           ),
         ),
-      ]
+      ],
     );
   }
 }

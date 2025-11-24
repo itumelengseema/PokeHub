@@ -7,6 +7,7 @@ class ApiServices {
   static const String baseUrl = 'https://pokeapi.co/api/v2/pokemon/';
 
   Future<List<Pokemon>> fetchPokemon(int offset, int limit) async {
+    limit = 30;
     try {
       final response = await http.get(
         Uri.parse('$baseUrl?offset=$offset&limit=$limit'),

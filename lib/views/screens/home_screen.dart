@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:pokedex_app/controllers/pokemon_controller.dart';
+import 'package:pokedex_app/controllers/favorites_controller.dart';
 import 'package:pokedex_app/models/pokemon.dart';
 import 'package:pokedex_app/views/widgets/pokemon_card.dart';
 import 'package:pokedex_app/views/widgets/search_bar.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final FavoritesController favoritesController;
+
+  const HomeScreen({super.key, required this.favoritesController});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -13,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final PokemonController controller = PokemonController();
+  final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   List<Pokemon> pokemonList = [];
   int _offset = 0;
@@ -25,12 +29,18 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _loadMorePokemon();
     _scrollController.addListener(_onScroll);
+    widget.favoritesController.addListener(_onFavoritesChanged);
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    widget.favoritesController.removeListener(_onFavoritesChanged);
     super.dispose();
+  }
+
+  void _onFavoritesChanged() {
+    setState(() {});
   }
 
   void _onScroll() {
@@ -132,7 +142,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                 );
                               }
                               final pokemon = pokemonList[index];
-                              return PokemonCard(pokemon: pokemon);
+                              return PokemonCard(
+                                pokemon: pokemon,
+                                isFavorite: widget.favoritesController
+                                    .isFavorite(pokemon),
+                                onFavoriteToggle: () {
+                                  widget.favoritesController.toggleFavorite(
+                                    pokemon,
+                                  );
+                                },
+                              );
                             },
                           ),
                   ),
