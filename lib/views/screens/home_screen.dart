@@ -4,6 +4,7 @@ import 'package:pokedex_app/controllers/favorites_controller.dart';
 import 'package:pokedex_app/models/pokemon.dart';
 import 'package:pokedex_app/views/widgets/pokemon_card.dart';
 import 'package:pokedex_app/views/widgets/search_bar.dart';
+import 'package:pokedex_app/services/api_services.dart';
 
 class HomeScreen extends StatefulWidget {
   final FavoritesController favoritesController;
@@ -16,9 +17,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final PokemonController controller = PokemonController();
+  final ApiServices _apiServices = ApiServices();
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   List<Pokemon> pokemonList = [];
+  List<Pokemon> filteredPokemonList = [];
   int _offset = 0;
   final int _limit = 20;
   bool _isLoading = false;
@@ -34,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _searchController.dispose();
     _scrollController.dispose();
     widget.favoritesController.removeListener(_onFavoritesChanged);
     super.dispose();
@@ -52,6 +56,21 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _filterPokemon(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        filteredPokemonList = pokemonList;
+      } else {
+        filteredPokemonList = pokemonList
+            .where(
+              (pokemon) =>
+                  pokemon.name.toLowerCase().contains(query.toLowerCase()),
+            )
+            .toList();
+      }
+    });
+  }
+
   Future<void> _loadMorePokemon() async {
     if (_isLoading) return;
 
@@ -63,12 +82,16 @@ class _HomeScreenState extends State<HomeScreen> {
       final newPokemon = await controller.fetchPokemon(_offset, _limit);
       setState(() {
         pokemonList.addAll(newPokemon);
+        filteredPokemonList = pokemonList;
         _offset += _limit;
         _isLoading = false;
         if (newPokemon.length < _limit) {
           _hasMore = false;
         }
       });
+
+      // Prefetch details for newly loaded Pokemon
+      _apiServices.prefetchPokemonDetails(newPokemon);
     } catch (e) {
       setState(() {
         _isLoading = false;
@@ -111,11 +134,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: PokemonSearchBar(),
+                    child: PokemonSearchBar(
+                      controller: _searchController,
+                      hintText: 'Search Pokémon...',
+                      onSearch: _filterPokemon,
+                    ),
                   ),
                   SizedBox(height: 16),
                   Expanded(
-                    child: pokemonList.isEmpty
+                    child: filteredPokemonList.isEmpty
                         ? Center(child: Text('No Pokémon found'))
                         : GridView.builder(
                             controller: _scrollController,
@@ -131,9 +158,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                   crossAxisSpacing: 12,
                                   mainAxisSpacing: 12,
                                 ),
-                            itemCount: pokemonList.length + (_hasMore ? 1 : 0),
+                            itemCount:
+                                filteredPokemonList.length +
+                                (_hasMore && _searchController.text.isEmpty
+                                    ? 1
+                                    : 0),
                             itemBuilder: (context, index) {
-                              if (index == pokemonList.length) {
+                              if (index == filteredPokemonList.length) {
                                 return Center(
                                   child: Padding(
                                     padding: const EdgeInsets.all(16.0),
@@ -141,11 +172,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 );
                               }
-                              final pokemon = pokemonList[index];
+                              final pokemon = filteredPokemonList[index];
                               return PokemonCard(
                                 pokemon: pokemon,
                                 isFavorite: widget.favoritesController
                                     .isFavorite(pokemon),
+                                favoritesController: widget.favoritesController,
                                 onFavoriteToggle: () {
                                   widget.favoritesController.toggleFavorite(
                                     pokemon,

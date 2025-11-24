@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pokedex_app/controllers/favorites_controller.dart';
 import 'package:pokedex_app/models/pokemon.dart';
 import 'package:pokedex_app/views/widgets/pokemon_card.dart';
+import 'package:pokedex_app/views/widgets/search_bar.dart';
 
 class FavoritesScreen extends StatefulWidget {
   final FavoritesController favoritesController;
@@ -72,25 +73,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
                   // Search Bar
                   SizedBox(height: 16),
-                  TextField(
+                  PokemonSearchBar(
                     controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search favorites...',
-                      prefixIcon: Icon(Icons.search),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: Icon(Icons.clear),
-                              onPressed: () {
-                                _searchController.clear();
-                              },
-                            )
-                          : null,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[100],
-                    ),
+                    hintText: 'Search favorites...',
+                    onSearch: (query) {
+                      _filterFavorites();
+                    },
                   ),
                 ],
               ),
@@ -145,6 +133,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         return PokemonCard(
                           pokemon: pokemon,
                           isFavorite: true,
+                          favoritesController: widget.favoritesController,
                           onFavoriteToggle: () {
                             widget.favoritesController.toggleFavorite(pokemon);
                           },
