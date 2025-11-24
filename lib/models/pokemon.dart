@@ -1,20 +1,11 @@
-class DummyPokemonData {
-  static List<Pokemon> pokemon = [
-    Pokemon(name: "bulbasaur", url: "https://pokeapi.co/api/v2/pokemon/1/"),
-    Pokemon(name: "ivysaur", url: "https://pokeapi.co/api/v2/pokemon/2/"),
-    Pokemon(name: "venusaur", url: "https://pokeapi.co/api/v2/pokemon/3/"),
-    Pokemon(name: "charmander", url: "https://pokeapi.co/api/v2/pokemon/4/"),
-  ];
-}
-
 class Pokemon {
   final String name;
   final String url;
+  final String? imageUrl;
 
-  Pokemon({required this.name, required this.url, String? imageUrl});
+  Pokemon({required this.name, required this.url, this.imageUrl});
 }
 
-// {
 //   "count": 1328,
 //   "next": "https://pokeapi.co/api/v2/pokemon/?offset=20&limit=20",
 //   "previous": null,

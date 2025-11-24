@@ -1,10 +1,10 @@
 import 'package:pokedex_app/models/pokemon.dart';
+import 'package:pokedex_app/services/api_services.dart';
 
-// class PokemonController {
-//   final ApiService apiService = ApiService();
-//   Future<List<Pokemon>> getDummyPokemon() async {
-//     await Future.delayed(Duration(seconds: 3));
+class PokemonController {
+  final ApiServices _apiService = ApiServices();
 
-//     return DummyPokemonData.pokemon;
-//   }
-// }
+  Future<List<Pokemon>> fetchPokemon(int offset, int limit) async {
+    return _apiService.fetchPokemon(offset, limit);
+  }
+}
