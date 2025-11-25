@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pokedex_app/controllers/theme_controller.dart';
+import 'package:pokedex_app/controllers/auth_controller.dart';
 import 'package:pokedex_app/models/user_profile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfileScreen extends StatefulWidget {
   final ThemeController themeController;
@@ -13,12 +15,24 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late UserProfile _userProfile;
+  final AuthController _authController = AuthController();
 
   @override
   void initState() {
     super.initState();
-    // Load dummy data - will be replaced with Firebase
-    _userProfile = UserProfile.dummy();
+    // Load user data from Firebase
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      _userProfile = UserProfile(
+        name: user.displayName ?? 'Pokémon Trainer',
+        email: user.email ?? '',
+        joinedDate: user.metadata.creationTime ?? DateTime.now(),
+        bio: 'Gotta catch \'em all!',
+        profileImageUrl: user.photoURL,
+      );
+    } else {
+      _userProfile = UserProfile.dummy();
+    }
   }
 
   void _showLogoutDialog() {
@@ -33,12 +47,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              // TODO: Implement Firebase logout
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Logged out successfully')),
-              );
+              try {
+                await _authController.logout();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Logged out successfully'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Logout failed: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
             },
             child: Text('Logout', style: TextStyle(color: Colors.red)),
           ),

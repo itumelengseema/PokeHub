@@ -1,55 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:pokedex_app/controllers/auth_controller.dart';
-import 'package:pokedex_app/views/screens/signup_screen.dart';
-import 'package:pokedex_app/views/screens/forgot_password_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   final AuthController _authController = AuthController();
   bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
   bool _isLoading = false;
 
   @override
   void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleSignup() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
 
       try {
-        await _authController.login(
-          emailController.text.trim(),
-          passwordController.text,
+        await _authController.register(
+          _emailController.text.trim(),
+          _passwordController.text,
         );
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Login successful!'),
+              content: Text('Account created successfully!'),
               backgroundColor: Colors.green,
             ),
           );
+          Navigator.pop(context);
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Login failed: $e'),
+              content: Text('Sign up failed: ${e.toString()}'),
               backgroundColor: Colors.red,
             ),
           );
@@ -64,20 +68,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _handleForgotPassword() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
-    );
-  }
-
-  void _handleSignUp() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => SignupScreen()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,33 +79,41 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Form(
               key: _formKey,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(height: 40),
+                  SizedBox(height: 20),
+                  // Back Button
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back, color: Color(0xFF2D3436), size: 28),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+
                   // Logo
                   Container(
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(18),
                     ),
                     child: Image.network(
                       'https://cdn.brandfetch.io/idyp519aAf/w/1024/h/1022/theme/dark/symbol.png?c=1bxid64Mup7aczewSAYMX&t=1721651819488',
-                      width: 80,
-                      height: 80,
+                      width: 70,
+                      height: 70,
                       errorBuilder: (context, error, stackTrace) {
                         return Icon(
                           Icons.catching_pokemon,
-                          size: 80,
+                          size: 70,
                           color: Colors.red[400],
                         );
                       },
                     ),
                   ),
-                  SizedBox(height: 32),
-                  // Title
+                  SizedBox(height: 24),
                   Text(
-                    'Welcome Back',
+                    'Create Account',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -124,22 +122,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Login to your account',
-                    style: TextStyle(fontSize: 16, color: Color(0xFF636E72)),
+                    'Start your Pokémon journey today',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF636E72),
+                    ),
                   ),
-                  SizedBox(height: 48),
+                  SizedBox(height: 40),
 
-                  // Email Field
+                  // Name Field
                   TextFormField(
-                    controller: emailController,
-                    keyboardType: TextInputType.emailAddress,
+                    controller: _nameController,
                     decoration: InputDecoration(
-                      labelText: 'Email',
-                      hintText: 'Enter your email',
-                      prefixIcon: Icon(
-                        Icons.email_outlined,
-                        color: Colors.black87,
-                      ),
+                      labelText: 'Full Name',
+                      hintText: 'Enter your name',
+                      prefixIcon: Icon(Icons.person_outlined, color: Color(0xFF6C5CE7)),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
@@ -150,14 +147,44 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.black87, width: 2),
+                        borderSide: BorderSide(color: Color(0xFF6C5CE7), width: 2),
                       ),
                       filled: true,
                       fillColor: Color(0xFFF5F5F5),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 18,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your name';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 16),
+
+                  // Email Field
+                  TextFormField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      hintText: 'Enter your email',
+                      prefixIcon: Icon(Icons.email_outlined, color: Color(0xFF6C5CE7)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
                       ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: Color(0xFF6C5CE7), width: 2),
+                      ),
+                      filled: true,
+                      fillColor: Color(0xFFF5F5F5),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -169,19 +196,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 16),
 
                   // Password Field
                   TextFormField(
-                    controller: passwordController,
+                    controller: _passwordController,
                     obscureText: !_isPasswordVisible,
                     decoration: InputDecoration(
                       labelText: 'Password',
-                      hintText: 'Enter your password',
-                      prefixIcon: Icon(
-                        Icons.lock_outlined,
-                        color: Colors.black,
-                      ),
+                      hintText: 'Create a password',
+                      prefixIcon: Icon(Icons.lock_outlined, color: Color(0xFF6C5CE7)),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isPasswordVisible
@@ -205,18 +229,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.black, width: 2),
+                        borderSide: BorderSide(color: Color(0xFF6C5CE7), width: 2),
                       ),
                       filled: true,
                       fillColor: Color(0xFFF5F5F5),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 18,
-                      ),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
+                        return 'Please enter a password';
                       }
                       if (value.length < 6) {
                         return 'Password must be at least 6 characters';
@@ -224,32 +245,65 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 12),
+                  SizedBox(height: 16),
 
-                  // Forgot Password
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: _handleForgotPassword,
-                      child: Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
+                  // Confirm Password Field
+                  TextFormField(
+                    controller: _confirmPasswordController,
+                    obscureText: !_isConfirmPasswordVisible,
+                    decoration: InputDecoration(
+                      labelText: 'Confirm Password',
+                      hintText: 'Re-enter your password',
+                      prefixIcon: Icon(Icons.lock_outlined, color: Color(0xFF6C5CE7)),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isConfirmPasswordVisible
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                          color: Color(0xFF636E72),
                         ),
+                        onPressed: () {
+                          setState(() {
+                            _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                          });
+                        },
                       ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: Color(0xFF6C5CE7), width: 2),
+                      ),
+                      filled: true,
+                      fillColor: Color(0xFFF5F5F5),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                     ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please confirm your password';
+                      }
+                      if (value != _passwordController.text) {
+                        return 'Passwords do not match';
+                      }
+                      return null;
+                    },
                   ),
-                  SizedBox(height: 24),
+                  SizedBox(height: 32),
 
-                  // Login Button
+                  // Sign Up Button
                   SizedBox(
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : _handleLogin,
+                      onPressed: _isLoading ? null : _handleSignup,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
+                        backgroundColor: Color(0xFF6C5CE7),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -266,7 +320,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             )
                           : Text(
-                              'Login',
+                              'Sign Up',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -274,106 +328,25 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                     ),
                   ),
-                  SizedBox(height: 32),
+                  SizedBox(height: 24),
 
-                  // Divider
-                  Row(
-                    children: [
-                      Expanded(child: Divider(color: Color(0xFFDFE6E9))),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          'OR',
-                          style: TextStyle(
-                            color: Color(0xFF636E72),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      Expanded(child: Divider(color: Color(0xFFDFE6E9))),
-                    ],
-                  ),
-                  SizedBox(height: 32),
-
-                  // Social Login Buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Google sign-in - Coming soon!'),
-                              ),
-                            );
-                          },
-                          icon: Icon(
-                            Icons.g_mobiledata,
-                            size: 28,
-                            color: Color(0xFF2D3436),
-                          ),
-                          label: Text(
-                            'Google',
-                            style: TextStyle(color: Color(0xFF2D3436)),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 14),
-                            side: BorderSide(color: Color(0xFFDFE6E9)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Apple sign-in - Coming soon!'),
-                              ),
-                            );
-                          },
-                          icon: Icon(
-                            Icons.apple,
-                            size: 28,
-                            color: Color(0xFF2D3436),
-                          ),
-                          label: Text(
-                            'Apple',
-                            style: TextStyle(color: Color(0xFF2D3436)),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 14),
-                            side: BorderSide(color: Color(0xFFDFE6E9)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 32),
-
-                  // Sign Up Link
+                  // Login Link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Don't have an account? ",
+                        'Already have an account? ',
                         style: TextStyle(
                           color: Color(0xFF636E72),
                           fontSize: 16,
                         ),
                       ),
                       GestureDetector(
-                        onTap: _handleSignUp,
+                        onTap: () => Navigator.pop(context),
                         child: Text(
-                          'Sign Up',
+                          'Login',
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Color(0xFF6C5CE7),
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),

@@ -5,55 +5,20 @@ import 'package:pokedex_app/controllers/theme_controller.dart';
 import 'package:pokedex_app/firebase_options.dart';
 import 'package:pokedex_app/views/screens/home_screen.dart';
 import 'package:pokedex_app/views/screens/favorites_screen.dart';
-import 'package:pokedex_app/views/screens/login_screen.dart';
 import 'package:pokedex_app/views/screens/profile_screen.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:pokedex_app/views/screens/auth_wrapper.dart';
 
-void main( ) async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MainApp());
 }
 
-class MainApp extends StatefulWidget {
+class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
   @override
-  State<MainApp> createState() => _MainAppState();
-}
-
-class _MainAppState extends State<MainApp> {
-  int currentPage = 0;
-  final FavoritesController _favoritesController = FavoritesController();
-  final ThemeController _themeController = ThemeController();
-
-  @override
-  void initState() {
-    super.initState();
-    _themeController.addListener(() {
-      setState(() {});
-    });
-  }
-
-  @override
-  void dispose() {
-    _favoritesController.dispose();
-    _themeController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final screens = [
-      LoginScreen(),
-      HomeScreen(favoritesController: _favoritesController),
-      FavoritesScreen(favoritesController: _favoritesController),
-      ProfileScreen(themeController: _themeController),
-
-    ];
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData.light().copyWith(
@@ -85,25 +50,60 @@ class _MainAppState extends State<MainApp> {
           ),
         ),
       ),
-      themeMode: _themeController.themeMode,
-      home: Scaffold(
-        body: SafeArea(child: screens[currentPage]),
-        bottomNavigationBar: NavigationBar(
-          onDestinationSelected: (int index) {
-            setState(() {
-              currentPage = index;
-            });
-          },
-          selectedIndex: currentPage,
-          destinations: [
-            NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-            NavigationDestination(
-              icon: Icon(Icons.favorite),
-              label: 'Favorites',
-            ),
-            NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
-          ],
-        ),
+      home: AuthWrapper(),
+    );
+  }
+}
+
+class HomeWrapper extends StatefulWidget {
+  const HomeWrapper({super.key});
+
+  @override
+  State<HomeWrapper> createState() => _HomeWrapperState();
+}
+
+class _HomeWrapperState extends State<HomeWrapper> {
+  int currentPage = 0;
+  final FavoritesController _favoritesController = FavoritesController();
+  final ThemeController _themeController = ThemeController();
+
+  @override
+  void initState() {
+    super.initState();
+    _themeController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _favoritesController.dispose();
+    _themeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screens = [
+      HomeScreen(favoritesController: _favoritesController),
+      FavoritesScreen(favoritesController: _favoritesController),
+      ProfileScreen(themeController: _themeController),
+    ];
+
+    return Scaffold(
+      body: SafeArea(child: screens[currentPage]),
+      bottomNavigationBar: NavigationBar(
+        onDestinationSelected: (int index) {
+          setState(() {
+            currentPage = index;
+          });
+        },
+        selectedIndex: currentPage,
+        destinations: [
+          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.favorite), label: 'Favorites'),
+          NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
+        ],
       ),
     );
   }
