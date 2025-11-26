@@ -20,18 +20,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // Load user data from Firebase
+    _loadUserProfile();
+  }
+
+  void _loadUserProfile() {
+    // Reload Firebase user to get latest data
+    FirebaseAuth.instance.currentUser?.reload();
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      _userProfile = UserProfile(
-        name: user.displayName ?? 'Pokémon Trainer',
-        email: user.email ?? '',
-        joinedDate: user.metadata.creationTime ?? DateTime.now(),
-        bio: 'Gotta catch \'em all!',
-        profileImageUrl: user.photoURL,
-      );
+      setState(() {
+        _userProfile = UserProfile(
+          name: user.displayName ?? 'Pokémon Trainer',
+          email: user.email ?? '',
+          joinedDate: user.metadata.creationTime ?? DateTime.now(),
+          bio: 'Gotta catch \'em all!',
+          profileImageUrl: user.photoURL,
+        );
+      });
     } else {
-      _userProfile = UserProfile.dummy();
+      setState(() {
+        _userProfile = UserProfile.fromJson({});
+      });
     }
   }
 
@@ -48,11 +57,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context);
+              final navigator = Navigator.of(context);
+              final messenger = ScaffoldMessenger.of(context);
+              navigator.pop();
               try {
                 await _authController.logout();
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     SnackBar(
                       content: Text('Logged out successfully'),
                       backgroundColor: Colors.green,
@@ -61,7 +72,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 }
               } catch (e) {
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     SnackBar(
                       content: Text('Logout failed: $e'),
                       backgroundColor: Colors.red,
@@ -98,206 +109,254 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? Colors.grey[900] : Colors.white;
+    final cardColor = isDark ? Colors.grey[850] : Color(0xFFF5F5F5);
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subtextColor = isDark ? Colors.grey[400] : Colors.black54;
 
     return Scaffold(
+      backgroundColor: backgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Header
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isDark
-                        ? [Colors.grey[800]!, Colors.grey[900]!]
-                        : [
-                            const Color.fromARGB(255, 243, 77, 65),
-                            const Color.fromARGB(255, 156, 30, 13),
-                          ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    children: [
-                      // Profile Image
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 4),
-                        ),
-                        child: CircleAvatar(
-                          radius: 60,
-                          backgroundImage: _userProfile.profileImageUrl != null
-                              ? NetworkImage(_userProfile.profileImageUrl!)
-                              : null,
-                          child: _userProfile.profileImageUrl == null
-                              ? Icon(
-                                  Icons.person,
-                                  size: 60,
-                                  color: Colors.white,
-                                )
-                              : null,
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        _userProfile.name,
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        _userProfile.email,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white.withValues(alpha: 0.9),
-                        ),
-                      ),
-                      if (_userProfile.bio != null) ...[
-                        SizedBox(height: 12),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            _userProfile.bio!,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ),
-                      ],
-                      SizedBox(height: 12),
-                      Text(
-                        'Member since ${_formatDate(_userProfile.joinedDate)}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white.withValues(alpha: 0.7),
-                        ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: 20),
+                // Profile Image
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: cardColor,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
                       ),
                     ],
                   ),
+                  padding: EdgeInsets.all(4),
+                  child: CircleAvatar(
+                    radius: 60,
+                    backgroundColor: cardColor,
+                    backgroundImage: _userProfile.profileImageUrl != null
+                        ? NetworkImage(_userProfile.profileImageUrl!)
+                        : null,
+                    child: _userProfile.profileImageUrl == null
+                        ? Icon(Icons.person, size: 60, color: textColor)
+                        : null,
+                  ),
                 ),
-              ),
-
-              // Settings Section
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Settings',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                SizedBox(height: 24),
+                Text(
+                  _userProfile.name,
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  _userProfile.email,
+                  style: TextStyle(fontSize: 16, color: subtextColor),
+                  textAlign: TextAlign.center,
+                ),
+                if (_userProfile.bio != null) ...[
+                  SizedBox(height: 16),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: cardColor,
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    SizedBox(height: 16),
+                    child: Text(
+                      _userProfile.bio!,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: subtextColor,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+                SizedBox(height: 12),
+                Text(
+                  'Member since ${_formatDate(_userProfile.joinedDate)}',
+                  style: TextStyle(fontSize: 13, color: subtextColor),
+                ),
+                SizedBox(height: 40),
 
-                    // Theme Toggle
-                    Card(
-                      elevation: 2,
-                      child: ListTile(
-                        leading: Icon(
-                          widget.themeController.isDarkMode
-                              ? Icons.dark_mode
-                              : Icons.light_mode,
-                          color: widget.themeController.isDarkMode
-                              ? Colors.orange
-                              : Colors.blue,
+                SizedBox(height: 40),
+
+                // Settings Section
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Settings',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
                         ),
-                        title: Text('Dark Mode'),
-                        subtitle: Text(
-                          widget.themeController.isDarkMode
-                              ? 'Switch to light theme'
-                              : 'Switch to dark theme',
-                        ),
+                      ),
+                      SizedBox(height: 20),
+
+                      // Theme Toggle
+                      _buildSettingItem(
+                        icon: widget.themeController.isDarkMode
+                            ? Icons.dark_mode
+                            : Icons.light_mode,
+                        iconColor: widget.themeController.isDarkMode
+                            ? Colors.orange[300]
+                            : Colors.amber[700],
+                        title: 'Dark Mode',
+                        subtitle: widget.themeController.isDarkMode
+                            ? 'Enabled'
+                            : 'Disabled',
                         trailing: Switch(
                           value: widget.themeController.isDarkMode,
                           onChanged: (value) {
                             widget.themeController.toggleTheme();
                           },
+                          activeTrackColor: Colors.black87,
                         ),
+                        isDark: isDark,
+                        textColor: textColor,
+                        subtextColor: subtextColor,
                       ),
-                    ),
-                    SizedBox(height: 12),
+                      SizedBox(height: 12),
 
-                    // Edit Profile
-                    Card(
-                      elevation: 2,
-                      child: ListTile(
-                        leading: Icon(Icons.edit, color: Colors.green),
-                        title: Text('Edit Profile'),
-                        subtitle: Text('Update your profile information'),
-                        trailing: Icon(Icons.arrow_forward_ios, size: 16),
-                        onTap: () {
-                          // TODO: Navigate to edit profile screen
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Edit profile - Coming soon!'),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 12),
-
-                    // Notifications
-                    SizedBox(height: 24),
-
-                    // Account Section
-                    Text(
-                      'Account',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 16),
-
-                    // Logout Button
-                    Card(
-                      elevation: 2,
-                      color: Colors.red[50],
-                      child: ListTile(
-                        leading: Icon(Icons.logout, color: Colors.red),
-                        title: Text(
-                          'Logout',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        subtitle: Text('Sign out of your account'),
+                      // Edit Profile
+                      _buildSettingItem(
+                        icon: Icons.edit_outlined,
+                        iconColor: Colors.green[600],
+                        title: 'Edit Profile',
+                        subtitle: 'Update your information',
                         trailing: Icon(
                           Icons.arrow_forward_ios,
                           size: 16,
-                          color: Colors.red,
+                          color: subtextColor,
                         ),
-                        onTap: _showLogoutDialog,
+                        onTap: () {
+                          final messenger = ScaffoldMessenger.of(context);
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: Text('Edit profile - Coming soon!'),
+                              backgroundColor: Colors.black87,
+                            ),
+                          );
+                        },
+                        isDark: isDark,
+                        textColor: textColor,
+                        subtextColor: subtextColor,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
+
+                // Logout Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton.icon(
+                    onPressed: _showLogoutDialog,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red[50],
+                      foregroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                      side: BorderSide(color: Colors.red, width: 1),
+                    ),
+                    icon: Icon(Icons.logout),
+                    label: Text(
+                      'Logout',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 32),
-                  ],
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: 32),
+              ],
+            ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSettingItem({
+    required IconData icon,
+    required Color? iconColor,
+    required String title,
+    required String subtitle,
+    required Widget trailing,
+    VoidCallback? onTap,
+    required bool isDark,
+    required Color textColor,
+    required Color? subtextColor,
+  }) {
+    final cardBg = isDark ? Colors.grey[800] : Colors.white;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: iconColor?.withValues(alpha: 0.2) ?? Colors.grey[200],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: iconColor, size: 24),
+            ),
+            SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 13, color: subtextColor),
+                  ),
+                ],
+              ),
+            ),
+            trailing,
+          ],
         ),
       ),
     );

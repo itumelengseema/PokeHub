@@ -13,14 +13,15 @@ class UserProfile {
     required this.joinedDate,
   });
 
-  // Dummy data for now - will be replaced with Firebase data
-  factory UserProfile.dummy() {
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
-      name: 'Itumeleng Seema',
-      email: 'Itumeleng@gmail.com',
-      profileImageUrl: 'https://cdn.brandfetch.io/idyp519aAf/w/1024/h/1022/theme/dark/symbol.png?c=1bxid64Mup7aczewSAYMX&t=1721651819488',
-      bio: 'Gotta catch \'em all!',
-      joinedDate: DateTime(2024, 1, 15),
+      name: json['name'] as String? ?? 'Pokémon Trainer',
+      email: json['email'] as String? ?? '',
+      profileImageUrl: json['profileImageUrl'] as String?,
+      bio: json['bio'] as String?,
+      joinedDate: json['joinedDate'] != null
+          ? DateTime.parse(json['joinedDate'] as String)
+          : DateTime.now(),
     );
   }
 }

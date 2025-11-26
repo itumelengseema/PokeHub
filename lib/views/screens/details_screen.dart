@@ -34,7 +34,15 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   Future<void> _loadPokemonDetail() async {
     try {
+      if (widget.pokemon.url.isEmpty) {
+        throw Exception('Invalid Pokemon URL');
+      }
+
+      debugPrint('Loading Pokemon detail from URL: ${widget.pokemon.url}');
       final detail = await _apiServices.fetchPokemonDetail(widget.pokemon.url);
+
+      if (!mounted) return;
+
       setState(() {
         _pokemonDetail = detail;
         _isLoading = false;
@@ -49,6 +57,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
         });
       }
     } catch (e) {
+      debugPrint('Error loading Pokemon detail: $e');
+      if (!mounted) return;
+
       setState(() {
         _error = e.toString();
         _isLoading = false;
@@ -116,24 +127,68 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? Colors.grey[900] : Colors.white;
+    final cardColor = isDark ? Colors.grey[850] : Colors.grey[100];
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subtextColor = isDark ? Colors.grey[400] : Colors.grey[600];
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: backgroundColor,
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? SafeArea(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text(
+                      'Loading Pokemon details...',
+                      style: TextStyle(color: textColor),
+                    ),
+                  ],
+                ),
+              ),
+            )
           : _error != null
           ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 64, color: Colors.red),
-                  SizedBox(height: 16),
-                  Text('Failed to load Pokemon details'),
-                  SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: _loadPokemonDetail,
-                    child: Text('Retry'),
-                  ),
-                ],
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, size: 64, color: Colors.red),
+                    SizedBox(height: 16),
+                    Text(
+                      'Failed to load Pokemon details',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      _error!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      'Pokemon: ${widget.pokemon.name}',
+                      style: TextStyle(color: textColor),
+                    ),
+                    Text(
+                      'URL: ${widget.pokemon.url}',
+                      style: TextStyle(color: textColor),
+                    ),
+                    SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _loadPokemonDetail,
+                      child: Text('Retry'),
+                    ),
+                  ],
+                ),
               ),
             )
           : CustomScrollView(
@@ -220,7 +275,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: Colors.grey,
+                              color: subtextColor,
                             ),
                           ),
                         ),
@@ -256,11 +311,19 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               'Height',
                               '${(_pokemonDetail!.height / 10).toStringAsFixed(1)} m',
                               Icons.height,
+                              isDark,
+                              cardColor,
+                              textColor,
+                              subtextColor,
                             ),
                             _buildInfoCard(
                               'Weight',
                               '${(_pokemonDetail!.weight / 10).toStringAsFixed(1)} kg',
                               Icons.monitor_weight,
+                              isDark,
+                              cardColor,
+                              textColor,
+                              subtextColor,
                             ),
                           ],
                         ),
@@ -272,6 +335,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
+                            color: textColor,
                           ),
                         ),
                         SizedBox(height: 12),
@@ -286,7 +350,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                     vertical: 8,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[200],
+                                    color: cardColor,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
@@ -295,6 +359,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                         .toUpperCase(),
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
+                                      color: textColor,
                                     ),
                                   ),
                                 ),
@@ -309,6 +374,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
+                            color: textColor,
                           ),
                         ),
                         SizedBox(height: 12),
@@ -316,6 +382,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           (stat) => _buildStatBar(
                             stat.name.replaceAll('-', ' ').toUpperCase(),
                             stat.baseStat,
+                            isDark,
+                            textColor,
                           ),
                         ),
                         SizedBox(height: 24),
@@ -331,6 +399,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
+                                  color: textColor,
                                 ),
                               ),
                               SizedBox(height: 12),
@@ -352,7 +421,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                           width: 100,
                                           padding: EdgeInsets.all(8),
                                           decoration: BoxDecoration(
-                                            color: Colors.grey[100],
+                                            color: cardColor,
                                             borderRadius: BorderRadius.circular(
                                               12,
                                             ),
@@ -385,6 +454,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                 style: TextStyle(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.bold,
+                                                  color: textColor,
                                                 ),
                                                 textAlign: TextAlign.center,
                                               ),
@@ -424,29 +494,46 @@ class _DetailsScreenState extends State<DetailsScreen> {
     );
   }
 
-  Widget _buildInfoCard(String label, String value, IconData icon) {
+  Widget _buildInfoCard(
+    String label,
+    String value,
+    IconData icon,
+    bool isDark,
+    Color? cardColor,
+    Color textColor,
+    Color? subtextColor,
+  ) {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           Icon(icon, size: 32, color: Colors.blue),
           SizedBox(height: 8),
-          Text(label, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+          Text(label, style: TextStyle(fontSize: 14, color: subtextColor)),
           SizedBox(height: 4),
           Text(
             value,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStatBar(String statName, int value) {
+  Widget _buildStatBar(
+    String statName,
+    int value,
+    bool isDark,
+    Color textColor,
+  ) {
     final percentage = (value / 255).clamp(0.0, 1.0);
     Color barColor = Colors.green;
 
@@ -466,11 +553,19 @@ class _DetailsScreenState extends State<DetailsScreen> {
             children: [
               Text(
                 statName,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: textColor,
+                ),
               ),
               Text(
                 value.toString(),
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                ),
               ),
             ],
           ),
@@ -479,7 +574,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
               value: percentage,
-              backgroundColor: Colors.grey[200],
+              backgroundColor: isDark ? Colors.grey[800] : Colors.grey[200],
               valueColor: AlwaysStoppedAnimation<Color>(barColor),
               minHeight: 8,
             ),

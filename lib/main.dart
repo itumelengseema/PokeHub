@@ -11,16 +11,38 @@ import 'package:pokedex_app/views/screens/auth_wrapper.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MainApp());
+  runApp(MainApp());
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  final ThemeController _themeController = ThemeController();
+
+  @override
+  void initState() {
+    super.initState();
+    _themeController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _themeController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      themeMode: _themeController.themeMode,
       theme: ThemeData.light().copyWith(
         primaryColor: Colors.red,
         colorScheme: ColorScheme.light(
@@ -50,13 +72,15 @@ class MainApp extends StatelessWidget {
           ),
         ),
       ),
-      home: AuthWrapper(),
+      home: AuthWrapper(themeController: _themeController),
     );
   }
 }
 
 class HomeWrapper extends StatefulWidget {
-  const HomeWrapper({super.key});
+  final ThemeController themeController;
+
+  const HomeWrapper({super.key, required this.themeController});
 
   @override
   State<HomeWrapper> createState() => _HomeWrapperState();
@@ -65,12 +89,11 @@ class HomeWrapper extends StatefulWidget {
 class _HomeWrapperState extends State<HomeWrapper> {
   int currentPage = 0;
   final FavoritesController _favoritesController = FavoritesController();
-  final ThemeController _themeController = ThemeController();
 
   @override
   void initState() {
     super.initState();
-    _themeController.addListener(() {
+    widget.themeController.addListener(() {
       setState(() {});
     });
   }
@@ -78,7 +101,6 @@ class _HomeWrapperState extends State<HomeWrapper> {
   @override
   void dispose() {
     _favoritesController.dispose();
-    _themeController.dispose();
     super.dispose();
   }
 
@@ -87,7 +109,7 @@ class _HomeWrapperState extends State<HomeWrapper> {
     final screens = [
       HomeScreen(favoritesController: _favoritesController),
       FavoritesScreen(favoritesController: _favoritesController),
-      ProfileScreen(themeController: _themeController),
+      ProfileScreen(themeController: widget.themeController),
     ];
 
     return Scaffold(
@@ -100,7 +122,7 @@ class _HomeWrapperState extends State<HomeWrapper> {
         },
         selectedIndex: currentPage,
         destinations: [
-          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.home), label: 'Home',),
           NavigationDestination(icon: Icon(Icons.favorite), label: 'Favorites'),
           NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],

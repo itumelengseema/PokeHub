@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pokedex_app/views/screens/login_screen.dart';
 import 'package:pokedex_app/main.dart';
+import 'package:pokedex_app/controllers/theme_controller.dart';
 
 class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
+  final ThemeController themeController;
+
+  const AuthWrapper({super.key, required this.themeController});
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +59,7 @@ class AuthWrapper extends StatelessWidget {
 
         // User is signed in
         if (snapshot.hasData) {
-          return HomeWrapper();
+          return HomeWrapper(themeController: themeController);
         }
 
         // User is not signed in

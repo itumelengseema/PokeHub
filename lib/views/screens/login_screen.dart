@@ -27,6 +27,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
+      final messenger = ScaffoldMessenger.of(context);
+
       setState(() {
         _isLoading = true;
       });
@@ -38,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          messenger.showSnackBar(
             SnackBar(
               content: Text('Login successful!'),
               backgroundColor: Colors.green,
@@ -47,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          messenger.showSnackBar(
             SnackBar(
               content: Text('Login failed: $e'),
               backgroundColor: Colors.red,
@@ -76,6 +78,42 @@ class _LoginScreenState extends State<LoginScreen> {
       context,
       MaterialPageRoute(builder: (context) => SignupScreen()),
     );
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    final messenger = ScaffoldMessenger.of(context);
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final user = await _authController.signInWithGoogle();
+
+      if (user != null && mounted) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('Signed in with Google successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('Google sign-in failed: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -295,65 +333,32 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: 32),
 
-                  // Social Login Buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Google sign-in - Coming soon!'),
-                              ),
-                            );
-                          },
-                          icon: Icon(
-                            Icons.g_mobiledata,
-                            size: 28,
-                            color: Color(0xFF2D3436),
-                          ),
-                          label: Text(
-                            'Google',
-                            style: TextStyle(color: Color(0xFF2D3436)),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 14),
-                            side: BorderSide(color: Color(0xFFDFE6E9)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
+                  // Google Sign-In Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: _isLoading ? null : _handleGoogleSignIn,
+                      icon: Icon(
+                        Icons.g_mobiledata,
+                        size: 28,
+                        color: Color(0xFF2D3436),
+                      ),
+                      label: Text(
+                        'Continue with Google',
+                        style: TextStyle(
+                          color: Color(0xFF2D3436),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Apple sign-in - Coming soon!'),
-                              ),
-                            );
-                          },
-                          icon: Icon(
-                            Icons.apple,
-                            size: 28,
-                            color: Color(0xFF2D3436),
-                          ),
-                          label: Text(
-                            'Apple',
-                            style: TextStyle(color: Color(0xFF2D3436)),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 14),
-                            side: BorderSide(color: Color(0xFFDFE6E9)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                        side: BorderSide(color: Color(0xFFDFE6E9)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                    ],
+                    ),
                   ),
                   SizedBox(height: 32),
 
