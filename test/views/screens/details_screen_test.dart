@@ -1,5 +1,3 @@
-import 'package:mockito/mockito.dart';
-
 import 'home_screen_test.mocks.dart';
 
 void main() {
