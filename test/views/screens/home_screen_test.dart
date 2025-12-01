@@ -30,7 +30,7 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 
-  testWidgets('home screen displays Pokemon title and image', (tester) async {
+  testWidgets('home screen displays Pokemon title and ID', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: HomeScreen(favoritesController: mockFavoritesController),
