@@ -314,52 +314,52 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: 32),
 
-                  // Divider
-                  Row(
-                    children: [
-                      Expanded(child: Divider(color: Color(0xFFDFE6E9))),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          'OR',
-                          style: TextStyle(
-                            color: Color(0xFF636E72),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      Expanded(child: Divider(color: Color(0xFFDFE6E9))),
-                    ],
-                  ),
-                  SizedBox(height: 32),
+                  // // Divider
+                  // Row(
+                  //   children: [
+                  //     Expanded(child: Divider(color: Color(0xFFDFE6E9))),
+                  //     Padding(
+                  //       padding: EdgeInsets.symmetric(horizontal: 16),
+                  //       child: Text(
+                  //         'OR',
+                  //         style: TextStyle(
+                  //           color: Color(0xFF636E72),
+                  //           fontWeight: FontWeight.w600,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //     Expanded(child: Divider(color: Color(0xFFDFE6E9))),
+                  //   ],
+                  // ),
+                  // SizedBox(height: 32),
 
                   // Google Sign-In Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: _isLoading ? null : _handleGoogleSignIn,
-                      icon: Icon(
-                        Icons.g_mobiledata,
-                        size: 28,
-                        color: Color(0xFF2D3436),
-                      ),
-                      label: Text(
-                        'Continue with Google',
-                        style: TextStyle(
-                          color: Color(0xFF2D3436),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 14),
-                        side: BorderSide(color: Color(0xFFDFE6E9)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                    ),
-                  ),
+                  // SizedBox(
+                  //   width: double.infinity,
+                  //   child: OutlinedButton.icon(
+                  //     onPressed: _isLoading ? null : _handleGoogleSignIn,
+                  //     icon: Icon(
+                  //       Icons.g_mobiledata,
+                  //       size: 28,
+                  //       color: Color(0xFF2D3436),
+                  //     ),
+                  //     label: Text(
+                  //       'Continue with Google',
+                  //       style: TextStyle(
+                  //         color: Color(0xFF2D3436),
+                  //         fontSize: 16,
+                  //         fontWeight: FontWeight.w600,
+                  //       ),
+                  //     ),
+                  //     style: OutlinedButton.styleFrom(
+                  //       padding: EdgeInsets.symmetric(vertical: 14),
+                  //       side: BorderSide(color: Color(0xFFDFE6E9)),
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(16),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   SizedBox(height: 32),
 
                   // Sign Up Link
