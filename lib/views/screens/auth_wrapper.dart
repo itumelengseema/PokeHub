@@ -57,12 +57,12 @@ class AuthWrapper extends StatelessWidget {
           );
         }
 
-        // User is signed in
-        if (snapshot.hasData) {
+        // User is signed in with valid email
+        if (snapshot.hasData && snapshot.data?.email != null) {
           return HomeWrapper(themeController: themeController);
         }
 
-        // User is not signed in
+        // User is not signed in or has invalid auth data
         return LoginScreen();
       },
     );

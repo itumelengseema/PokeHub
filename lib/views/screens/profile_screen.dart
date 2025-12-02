@@ -31,7 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         _userProfile = UserProfile(
           name: user.displayName ?? 'Pokémon Trainer',
-          email: user.email ?? '',
+          email: user.email ?? '', // bugfix notes , this defaults to a string when email is null 
           joinedDate: user.metadata.creationTime ?? DateTime.now(),
           bio: 'Gotta catch \'em all!',
           profileImageUrl: user.photoURL,
