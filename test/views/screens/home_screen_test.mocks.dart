@@ -3,12 +3,12 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i7;
-import 'dart:ui' as _i5;
+import 'dart:async' as _i5;
+import 'dart:ui' as _i6;
 
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:pokedex_app/controllers/favorites_controller.dart' as _i3;
-import 'package:pokedex_app/controllers/pokemon_controller.dart' as _i6;
+import 'package:pokedex_app/controllers/pokemon_controller.dart' as _i7;
 import 'package:pokedex_app/models/pokemon.dart' as _i4;
 import 'package:pokedex_app/models/pokemon_detail.dart' as _i2;
 import 'package:pokedex_app/services/api_services.dart' as _i8;
@@ -57,9 +57,23 @@ class MockFavoritesController extends _i1.Mock
           as List<_i4.Pokemon>);
 
   @override
+  bool get isLoading =>
+      (super.noSuchMethod(Invocation.getter(#isLoading), returnValue: false)
+          as bool);
+
+  @override
   bool get hasListeners =>
       (super.noSuchMethod(Invocation.getter(#hasListeners), returnValue: false)
           as bool);
+
+  @override
+  _i5.Future<void> reloadFavorites() =>
+      (super.noSuchMethod(
+            Invocation.method(#reloadFavorites, []),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
 
   @override
   bool isFavorite(_i4.Pokemon? pokemon) =>
@@ -70,22 +84,40 @@ class MockFavoritesController extends _i1.Mock
           as bool);
 
   @override
-  void toggleFavorite(_i4.Pokemon? pokemon) => super.noSuchMethod(
-    Invocation.method(#toggleFavorite, [pokemon]),
-    returnValueForMissingStub: null,
-  );
+  _i5.Future<void> toggleFavorite(_i4.Pokemon? pokemon) =>
+      (super.noSuchMethod(
+            Invocation.method(#toggleFavorite, [pokemon]),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
 
   @override
-  void addFavorite(_i4.Pokemon? pokemon) => super.noSuchMethod(
-    Invocation.method(#addFavorite, [pokemon]),
-    returnValueForMissingStub: null,
-  );
+  _i5.Future<void> addFavorite(_i4.Pokemon? pokemon) =>
+      (super.noSuchMethod(
+            Invocation.method(#addFavorite, [pokemon]),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
 
   @override
-  void removeFavorite(_i4.Pokemon? pokemon) => super.noSuchMethod(
-    Invocation.method(#removeFavorite, [pokemon]),
-    returnValueForMissingStub: null,
-  );
+  _i5.Future<void> removeFavorite(_i4.Pokemon? pokemon) =>
+      (super.noSuchMethod(
+            Invocation.method(#removeFavorite, [pokemon]),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> clearFavorites() =>
+      (super.noSuchMethod(
+            Invocation.method(#clearFavorites, []),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
 
   @override
   List<_i4.Pokemon> searchFavorites(String? query) =>
@@ -96,13 +128,13 @@ class MockFavoritesController extends _i1.Mock
           as List<_i4.Pokemon>);
 
   @override
-  void addListener(_i5.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i6.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
   );
 
   @override
-  void removeListener(_i5.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i6.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#removeListener, [listener]),
     returnValueForMissingStub: null,
   );
@@ -123,18 +155,18 @@ class MockFavoritesController extends _i1.Mock
 /// A class which mocks [PokemonController].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockPokemonController extends _i1.Mock implements _i6.PokemonController {
+class MockPokemonController extends _i1.Mock implements _i7.PokemonController {
   MockPokemonController() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i7.Future<List<_i4.Pokemon>> fetchPokemon(int? offset, int? limit) =>
+  _i5.Future<List<_i4.Pokemon>> fetchPokemon(int? offset, int? limit) =>
       (super.noSuchMethod(
             Invocation.method(#fetchPokemon, [offset, limit]),
-            returnValue: _i7.Future<List<_i4.Pokemon>>.value(<_i4.Pokemon>[]),
+            returnValue: _i5.Future<List<_i4.Pokemon>>.value(<_i4.Pokemon>[]),
           )
-          as _i7.Future<List<_i4.Pokemon>>);
+          as _i5.Future<List<_i4.Pokemon>>);
 }
 
 /// A class which mocks [ApiServices].
@@ -146,45 +178,45 @@ class MockApiServices extends _i1.Mock implements _i8.ApiServices {
   }
 
   @override
-  _i7.Future<List<_i4.Pokemon>> fetchPokemon(int? offset, int? limit) =>
+  _i5.Future<List<_i4.Pokemon>> fetchPokemon(int? offset, int? limit) =>
       (super.noSuchMethod(
             Invocation.method(#fetchPokemon, [offset, limit]),
-            returnValue: _i7.Future<List<_i4.Pokemon>>.value(<_i4.Pokemon>[]),
+            returnValue: _i5.Future<List<_i4.Pokemon>>.value(<_i4.Pokemon>[]),
           )
-          as _i7.Future<List<_i4.Pokemon>>);
+          as _i5.Future<List<_i4.Pokemon>>);
 
   @override
-  _i7.Future<_i2.PokemonDetail> fetchPokemonDetail(String? url) =>
+  _i5.Future<_i2.PokemonDetail> fetchPokemonDetail(String? url) =>
       (super.noSuchMethod(
             Invocation.method(#fetchPokemonDetail, [url]),
-            returnValue: _i7.Future<_i2.PokemonDetail>.value(
+            returnValue: _i5.Future<_i2.PokemonDetail>.value(
               _FakePokemonDetail_0(
                 this,
                 Invocation.method(#fetchPokemonDetail, [url]),
               ),
             ),
           )
-          as _i7.Future<_i2.PokemonDetail>);
+          as _i5.Future<_i2.PokemonDetail>);
 
   @override
-  _i7.Future<void> prefetchPokemonDetails(List<_i4.Pokemon>? pokemonList) =>
+  _i5.Future<void> prefetchPokemonDetails(List<_i4.Pokemon>? pokemonList) =>
       (super.noSuchMethod(
             Invocation.method(#prefetchPokemonDetails, [pokemonList]),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i7.Future<_i2.EvolutionChain> fetchEvolutionChain(String? speciesUrl) =>
+  _i5.Future<_i2.EvolutionChain> fetchEvolutionChain(String? speciesUrl) =>
       (super.noSuchMethod(
             Invocation.method(#fetchEvolutionChain, [speciesUrl]),
-            returnValue: _i7.Future<_i2.EvolutionChain>.value(
+            returnValue: _i5.Future<_i2.EvolutionChain>.value(
               _FakeEvolutionChain_1(
                 this,
                 Invocation.method(#fetchEvolutionChain, [speciesUrl]),
               ),
             ),
           )
-          as _i7.Future<_i2.EvolutionChain>);
+          as _i5.Future<_i2.EvolutionChain>);
 }

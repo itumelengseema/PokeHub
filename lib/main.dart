@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:pokedex_app/controllers/favorites_controller.dart';
 import 'package:pokedex_app/controllers/theme_controller.dart';
 import 'package:pokedex_app/firebase_options.dart';
+import 'package:pokedex_app/services/favorites_service.dart';
 import 'package:pokedex_app/views/screens/home_screen.dart';
 import 'package:pokedex_app/views/screens/favorites_screen.dart';
 import 'package:pokedex_app/views/screens/profile_screen.dart';
@@ -94,13 +96,28 @@ class HomeWrapper extends StatefulWidget {
 
 class _HomeWrapperState extends State<HomeWrapper> {
   int currentPage = 0;
-  final FavoritesController _favoritesController = FavoritesController();
+  late final FavoritesController _favoritesController;
+  User? _currentUser;
 
   @override
   void initState() {
     super.initState();
+    _currentUser = FirebaseAuth.instance.currentUser;
+    _favoritesController = FavoritesController(FavoritesService());
     widget.themeController.addListener(() {
       setState(() {});
+    });
+
+    // Listen to auth state changes
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null && _currentUser != null) {
+        // User signed out, clear favorites
+        _favoritesController.clearFavorites();
+      } else if (user != null && _currentUser?.uid != user.uid) {
+        // User signed in or switched, reload favorites
+        _favoritesController.reloadFavorites();
+      }
+      _currentUser = user;
     });
   }
 
