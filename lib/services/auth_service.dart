@@ -9,25 +9,35 @@ class AuthService {
   // Sign Up
 
   Future<User?> signUp(String email, String password, String name) async {
-    final credential = await _auth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    if (credential.user != null) {
-      await credential.user!.updateDisplayName(name);
-      await credential.user!.reload();
-      return _auth.currentUser;
+    try {
+      final credential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if (credential.user != null) {
+        await credential.user!.updateDisplayName(name);
+        await credential.user!.reload();
+        return _auth.currentUser;
+      }
+      return credential.user;
+    } catch (e) {
+      debugPrint('Error signing up: $e');
+      rethrow;
     }
-    return credential.user;
   }
 
   // Sign In
   Future<User?> signIn(String email, String password) async {
-    final credential = await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    return credential.user;
+    try {
+      final credential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return credential.user;
+    } catch (e) {
+      debugPrint('Error signing in: $e');
+      rethrow;
+    }
   }
 
   // Sign out
