@@ -13,7 +13,10 @@ import 'package:pokedex_app/views/screens/auth_wrapper.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  if (Firebase.apps.isEmpty) { // this will prevent re-initialization error
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  }
+
 
   // FlutterNativeSplash.preserve(
   //   widgetsBinding: WidgetsFlutterBinding.ensureInitialized(),
