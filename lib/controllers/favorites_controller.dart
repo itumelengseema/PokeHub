@@ -90,10 +90,10 @@ class FavoritesController extends ChangeNotifier {
   List<Pokemon> searchFavorites(String query) {
     if (query.isEmpty) return favorites;
 
-    final lowerQuery = query.toLowerCase();
+    final lowerQuery = query.toLowerCase();// search is now case insensitive
     return _favorites.where((pokemon) {
       final name = pokemon.name.toLowerCase();
-      final id = pokemon.id;
+      final id = pokemon.id.toLowerCase();
       return name.contains(lowerQuery) || id.contains(lowerQuery);
     }).toList();
   }
