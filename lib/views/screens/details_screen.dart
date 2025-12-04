@@ -3,6 +3,7 @@ import 'package:pokedex_app/controllers/favorites_controller.dart';
 import 'package:pokedex_app/models/pokemon.dart';
 import 'package:pokedex_app/models/pokemon_detail.dart';
 import 'package:pokedex_app/services/api_services.dart';
+import 'package:pokedex_app/views/widgets/error_state_widget.dart';
 
 class DetailsScreen extends StatefulWidget {
   final Pokemon pokemon;
@@ -152,44 +153,17 @@ class _DetailsScreenState extends State<DetailsScreen> {
               ),
             )
           : _error != null
-          ? Center(
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline, size: 64, color: Colors.red),
-                    SizedBox(height: 16),
-                    Text(
-                      'Failed to load Pokemon details',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      _error!,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      'Pokemon: ${widget.pokemon.name}',
-                      style: TextStyle(color: textColor),
-                    ),
-                    Text(
-                      'URL: ${widget.pokemon.url}',
-                      style: TextStyle(color: textColor),
-                    ),
-                    SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _loadPokemonDetail,
-                      child: Text('Retry'),
-                    ),
-                  ],
-                ),
-              ),
+          ? ErrorStateWidget(
+              title: 'Failed to load Pokemon details',
+              errorMessage: _error!,
+              debugInfo: 'Pokemon: ${widget.pokemon.name}\nURL: ${widget.pokemon.url}',
+              onRetry: () {
+                setState(() {
+                  _error = null;
+                  _isLoading = true;
+                });
+                _loadPokemonDetail();
+              },
             )
           : CustomScrollView(
               slivers: [
