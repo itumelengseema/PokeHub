@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 // import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:pokedex_app/controllers/favorites_controller.dart';
 import 'package:pokedex_app/controllers/theme_controller.dart';
+import 'package:pokedex_app/core/theme/app_theme_data.dart';
 import 'package:pokedex_app/firebase_options.dart';
 import 'package:pokedex_app/services/favorites_service.dart';
 import 'package:pokedex_app/views/screens/home_screen.dart';
@@ -35,14 +36,6 @@ class _MainAppState extends State<MainApp> {
   final ThemeController _themeController = ThemeController();
 
   @override
-  void initState() {
-    super.initState();
-    _themeController.addListener(() {
-      setState(() {});
-    });
-  }
-
-  @override
   void dispose() {
     _themeController.dispose();
     super.dispose();
@@ -50,40 +43,20 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Pokedex',
-      debugShowCheckedModeBanner: false,
-      themeMode: _themeController.themeMode,
-      theme: ThemeData.light().copyWith(
-        primaryColor: Colors.red,
-        colorScheme: ColorScheme.light(
-          primary: Colors.red,
-          secondary: Colors.blue,
-        ),
-        scaffoldBackgroundColor: Colors.white,
-        cardTheme: CardThemeData(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
-      darkTheme: ThemeData.dark().copyWith(
-        primaryColor: Colors.red,
-        colorScheme: ColorScheme.dark(
-          primary: Colors.red,
-          secondary: Colors.blue,
-        ),
-        scaffoldBackgroundColor: Colors.grey[900],
-        cardTheme: CardThemeData(
-          elevation: 2,
-          color: Colors.grey[850],
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
-      home: AuthWrapper(themeController: _themeController),
+
+    return ValueListenableBuilder(
+      valueListenable: _themeController.themeNotifier,
+      builder: (context, theme, child) {
+        return MaterialApp(
+          title: 'Pokedex',
+          debugShowCheckedModeBanner: false,
+          themeMode: theme.themeMode,
+          theme: AppThemeData.lightTheme,
+          darkTheme: AppThemeData.darkTheme,
+          home: child,
+        );
+      },
+      child: AuthWrapper(themeController: _themeController),
     );
   }
 }
@@ -107,9 +80,6 @@ class _HomeWrapperState extends State<HomeWrapper> {
     super.initState();
     _currentUser = FirebaseAuth.instance.currentUser;
     _favoritesController = FavoritesController(FavoritesService());
-    widget.themeController.addListener(() {
-      setState(() {});
-    });
 
     // Listen to auth state changes
     FirebaseAuth.instance.authStateChanges().listen((User? user) {

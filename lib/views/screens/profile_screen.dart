@@ -263,28 +263,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       SizedBox(height: 20),
 
-                      // Theme Toggle
-                      _buildSettingItem(
-                        icon: widget.themeController.isDarkMode
-                            ? Icons.dark_mode
-                            : Icons.light_mode,
-                        iconColor: widget.themeController.isDarkMode
-                            ? Colors.orange[300]
-                            : Colors.amber[700],
-                        title: 'Dark Mode',
-                        subtitle: widget.themeController.isDarkMode
-                            ? 'Enabled'
-                            : 'Disabled',
-                        trailing: Switch(
-                          value: widget.themeController.isDarkMode,
-                          onChanged: (value) {
-                            widget.themeController.toggleTheme();
-                          },
-                          activeTrackColor: Colors.black87,
-                        ),
-                        isDark: isDark,
-                        textColor: textColor,
-                        subtextColor: subtextColor,
+                      // Theme Toggle - Using ValueListenableBuilder to prevent unnecessary rebuilds
+                      ValueListenableBuilder(
+                        valueListenable: widget.themeController.themeNotifier,
+                        builder: (context, theme, child) {
+                          return _buildSettingItem(
+                            icon: theme.isDarkMode
+                                ? Icons.dark_mode
+                                : Icons.light_mode,
+                            iconColor: theme.isDarkMode
+                                ? Colors.orange[300]
+                                : Colors.amber[700],
+                            title: 'Dark Mode',
+                            subtitle: theme.isDarkMode
+                                ? 'Enabled'
+                                : 'Disabled',
+                            trailing: Switch(
+                              value: theme.isDarkMode,
+                              onChanged: (value) {
+                                widget.themeController.toggleTheme();
+                              },
+                              activeTrackColor: Colors.black87,
+                            ),
+                            isDark: isDark,
+                            textColor: textColor,
+                            subtextColor: subtextColor,
+                          );
+                        },
                       ),
                       SizedBox(height: 12),
 
