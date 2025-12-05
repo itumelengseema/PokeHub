@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pokedex_app/widgets/responsive/responsive_builder.dart';
 
 class PokemonSearchBar extends StatefulWidget {
   final Function(String) onSearch;
@@ -39,36 +40,88 @@ class _PokemonSearchBarState extends State<PokemonSearchBar> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final size = context.responsive;
 
-    return Row(
-      children: [
-        Expanded(
-          child: TextField(
-            controller: _searchController,
-            onChanged: (value) {
-              setState(() {}); // Rebuild to show/hide clear button
-            },
-            decoration: InputDecoration(
-              hintText: widget.hintText,
-              prefixIcon: Icon(Icons.search),
-              suffixIcon: _searchController.text.isNotEmpty
-                  ? IconButton(
-                      icon: Icon(Icons.clear),
-                      onPressed: () {
-                        _searchController.clear();
-                        setState(() {});
-                      },
-                    )
-                  : null,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: size.responsiveValue(
+            mobile: double.infinity,
+            tablet: 600.0,
+            desktop: 500.0,
+          ),
+        ),
+        child: TextField(
+          controller: _searchController,
+          onChanged: (value) {
+            setState(() {}); // Rebuild to show/hide clear button
+          },
+          style: TextStyle(
+            fontSize: size.responsiveValue(
+              mobile: 16.0,
+              tablet: 15.0,
+              desktop: 14.0,
+            ),
+          ),
+          decoration: InputDecoration(
+            hintText: widget.hintText,
+            hintStyle: TextStyle(
+              fontSize: size.responsiveValue(
+                mobile: 16.0,
+                tablet: 15.0,
+                desktop: 14.0,
               ),
-              filled: true,
-              fillColor: isDark ? Colors.grey[800] : Colors.grey[100],
+            ),
+            prefixIcon: Icon(
+              Icons.search,
+              size: size.responsiveValue(
+                mobile: 24.0,
+                tablet: 22.0,
+                desktop: 20.0,
+              ),
+            ),
+            suffixIcon: _searchController.text.isNotEmpty
+                ? IconButton(
+                    icon: Icon(
+                      Icons.clear,
+                      size: size.responsiveValue(
+                        mobile: 24.0,
+                        tablet: 22.0,
+                        desktop: 20.0,
+                      ),
+                    ),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() {});
+                    },
+                  )
+                : null,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(
+                size.responsiveValue(
+                  mobile: 12.0,
+                  tablet: 10.0,
+                  desktop: 10.0,
+                ),
+              ),
+            ),
+            filled: true,
+            fillColor: isDark ? Colors.grey[800] : Colors.grey[100],
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: size.responsiveValue(
+                mobile: 16.0,
+                tablet: 14.0,
+                desktop: 12.0,
+              ),
+              vertical: size.responsiveValue(
+                mobile: 16.0,
+                tablet: 12.0,
+                desktop: 8.0,
+              ),
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }

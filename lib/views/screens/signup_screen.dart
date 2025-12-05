@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pokedex_app/controllers/auth_controller.dart';
+import 'package:pokedex_app/widgets/responsive/responsive_builder.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -75,66 +76,135 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = context.responsive;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  SizedBox(height: 20),
-                  // Back Button
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Color(0xFF2D3436),
-                        size: 28,
+            padding: size.responsiveHorizontalPadding(
+              mobile: 24.0,
+              tablet: 48.0,
+              desktop: 64.0,
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: size.responsiveValue(
+                  mobile: double.infinity,
+                  tablet: 500.0,
+                  desktop: 450.0,
+                ),
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: size.responsiveValue(
+                        mobile: 20.0,
+                        tablet: 16.0,
+                        desktop: 12.0,
                       ),
-                      onPressed: () => Navigator.pop(context),
                     ),
-                  ),
-                  SizedBox(height: 20),
+                    // Back Button
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: const Color(0xFF2D3436),
+                          size: size.responsiveValue(
+                            mobile: 28.0,
+                            tablet: 26.0,
+                            desktop: 24.0,
+                          ),
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ),
+                    SizedBox(
+                      height: size.responsiveValue(
+                        mobile: 20.0,
+                        tablet: 16.0,
+                        desktop: 12.0,
+                      ),
+                    ),
 
-                  // Logo
-                  Container(
-                    padding: EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(18),
+                    // Logo
+                    Container(
+                      padding: EdgeInsets.all(size.responsiveValue(
+                        mobile: 14.0,
+                        tablet: 12.0,
+                        desktop: 10.0,
+                      )),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Image.network(
+                        'https://cdn.brandfetch.io/idyp519aAf/w/1024/h/1022/theme/dark/symbol.png?c=1bxid64Mup7aczewSAYMX&t=1721651819488',
+                        width: size.responsiveValue(
+                          mobile: 70.0,
+                          tablet: 65.0,
+                          desktop: 60.0,
+                        ),
+                        height: size.responsiveValue(
+                          mobile: 70.0,
+                          tablet: 65.0,
+                          desktop: 60.0,
+                        ),
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(
+                            Icons.catching_pokemon,
+                            size: size.responsiveValue(
+                              mobile: 70.0,
+                              tablet: 65.0,
+                              desktop: 60.0,
+                            ),
+                            color: Colors.red[400],
+                          );
+                        },
+                      ),
                     ),
-                    child: Image.network(
-                      'https://cdn.brandfetch.io/idyp519aAf/w/1024/h/1022/theme/dark/symbol.png?c=1bxid64Mup7aczewSAYMX&t=1721651819488',
-                      width: 70,
-                      height: 70,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(
-                          Icons.catching_pokemon,
-                          size: 70,
-                          color: Colors.red[400],
-                        );
-                      },
+                    SizedBox(
+                      height: size.responsiveValue(
+                        mobile: 24.0,
+                        tablet: 20.0,
+                        desktop: 18.0,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 24),
-                  Text(
-                    'Create Account',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2D3436),
+                    Text(
+                      'Create Account',
+                      style: TextStyle(
+                        fontSize: size.responsiveValue(
+                          mobile: 32.0,
+                          tablet: 28.0,
+                          desktop: 26.0,
+                        ),
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF2D3436),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Start your Pokémon journey today',
-                    style: TextStyle(fontSize: 16, color: Color(0xFF636E72)),
-                  ),
-                  SizedBox(height: 40),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Start your Pokémon journey today',
+                      style: TextStyle(
+                        fontSize: size.responsiveValue(
+                          mobile: 16.0,
+                          tablet: 15.0,
+                          desktop: 14.0,
+                        ),
+                        color: const Color(0xFF636E72),
+                      ),
+                    ),
+                    SizedBox(
+                      height: size.responsiveValue(
+                        mobile: 40.0,
+                        tablet: 32.0,
+                        desktop: 28.0,
+                      ),
+                    ),
 
                   // Name Field
                   TextFormField(
@@ -385,8 +455,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 40),
-                ],
+                    SizedBox(height: 40),
+                  ],
+                ),
               ),
             ),
           ),

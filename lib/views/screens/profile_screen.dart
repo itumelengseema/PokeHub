@@ -3,6 +3,7 @@ import 'package:pokedex_app/controllers/theme_controller.dart';
 import 'package:pokedex_app/controllers/auth_controller.dart';
 import 'package:pokedex_app/models/user_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pokedex_app/widgets/responsive/responsive_builder.dart';
 
 class ProfileScreen extends StatefulWidget {
   final ThemeController themeController;
@@ -113,58 +114,106 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final cardColor = isDark ? Colors.grey[850] : Color(0xFFF5F5F5);
     final textColor = isDark ? Colors.white : Colors.black87;
     final subtextColor = isDark ? Colors.grey[400] : Colors.black54;
+    final size = context.responsive;
 
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 20),
-                // Profile Image
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: cardColor,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10,
-                        offset: Offset(0, 4),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: size.responsiveHorizontalPadding(
+              mobile: 16.0,
+              tablet: 32.0,
+              desktop: 48.0,
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: size.responsiveValue(
+                  mobile: double.infinity,
+                  tablet: 500.0,
+                  desktop: 450.0,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: size.responsiveValue(
+                      mobile: 20.0,
+                      tablet: 16.0,
+                      desktop: 12.0,
+                    ),
+                  ),
+                  // Profile Image
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: cardColor,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    padding: EdgeInsets.all(4),
+                    child: CircleAvatar(
+                      radius: size.responsiveValue(
+                        mobile: 60.0,
+                        tablet: 55.0,
+                        desktop: 50.0,
                       ),
-                    ],
+                      backgroundColor: cardColor,
+                      backgroundImage: _userProfile.profileImageUrl != null
+                          ? NetworkImage(_userProfile.profileImageUrl!)
+                          : null,
+                      child: _userProfile.profileImageUrl == null
+                          ? Icon(
+                              Icons.person,
+                              size: size.responsiveValue(
+                                mobile: 60.0,
+                                tablet: 55.0,
+                                desktop: 50.0,
+                              ),
+                              color: textColor,
+                            )
+                          : null,
+                    ),
                   ),
-                  padding: EdgeInsets.all(4),
-                  child: CircleAvatar(
-                    radius: 60,
-                    backgroundColor: cardColor,
-                    backgroundImage: _userProfile.profileImageUrl != null
-                        ? NetworkImage(_userProfile.profileImageUrl!)
-                        : null,
-                    child: _userProfile.profileImageUrl == null
-                        ? Icon(Icons.person, size: 60, color: textColor)
-                        : null,
+                  SizedBox(
+                    height: size.responsiveValue(
+                      mobile: 24.0,
+                      tablet: 20.0,
+                      desktop: 16.0,
+                    ),
                   ),
-                ),
-                SizedBox(height: 24),
-                Text(
-                  _userProfile.name,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
+                  Text(
+                    _userProfile.name,
+                    style: TextStyle(
+                      fontSize: size.responsiveValue(
+                        mobile: 28.0,
+                        tablet: 26.0,
+                        desktop: 24.0,
+                      ),
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 8),
-                Text(
-                  _userProfile.email,
-                  style: TextStyle(fontSize: 16, color: subtextColor),
-                  textAlign: TextAlign.center,
-                ),
+                  SizedBox(height: 8),
+                  Text(
+                    _userProfile.email,
+                    style: TextStyle(
+                      fontSize: size.responsiveValue(
+                        mobile: 16.0,
+                        tablet: 15.0,
+                        desktop: 14.0,
+                      ),
+                      color: subtextColor,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 if (_userProfile.bio != null) ...[
                   SizedBox(height: 16),
                   Container(
@@ -266,35 +315,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: 20),
-
-                // Logout Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton.icon(
-                    onPressed: _showLogoutDialog,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red[50],
-                      foregroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                      side: BorderSide(color: Colors.red, width: 1),
+                  SizedBox(
+                    height: size.responsiveValue(
+                      mobile: 20.0,
+                      tablet: 16.0,
+                      desktop: 12.0,
                     ),
-                    icon: Icon(Icons.logout),
-                    label: Text(
-                      'Logout',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                  ),
+
+                  // Logout Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: size.responsiveValue(
+                      mobile: 56.0,
+                      tablet: 50.0,
+                      desktop: 48.0,
+                    ),
+                    child: ElevatedButton.icon(
+                      onPressed: _showLogoutDialog,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red[50],
+                        foregroundColor: Colors.red,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                        side: BorderSide(color: Colors.red, width: 1),
+                      ),
+                      icon: Icon(Icons.logout),
+                      label: Text(
+                        'Logout',
+                        style: TextStyle(
+                          fontSize: size.responsiveValue(
+                            mobile: 18.0,
+                            tablet: 16.0,
+                            desktop: 15.0,
+                          ),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: 32),
-              ],
+                  SizedBox(
+                    height: size.responsiveValue(
+                      mobile: 32.0,
+                      tablet: 24.0,
+                      desktop: 16.0,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

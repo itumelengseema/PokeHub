@@ -3,6 +3,10 @@ import 'package:pokedex_app/controllers/favorites_controller.dart';
 import 'package:pokedex_app/models/pokemon.dart';
 import 'package:pokedex_app/views/widgets/pokemon_card.dart';
 import 'package:pokedex_app/views/widgets/search_bar.dart';
+import 'package:pokedex_app/widgets/responsive/responsive_builder.dart';
+import 'package:pokedex_app/utils/constants/app_spacing.dart';
+import 'package:pokedex_app/utils/constants/app_sizes.dart';
+import 'package:pokedex_app/utils/constants/app_text_styles.dart';
 
 class FavoritesScreen extends StatefulWidget {
   final FavoritesController favoritesController;
@@ -50,119 +54,207 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+        child: ResponsiveBuilder(
+          builder: (context, deviceType, size) {
+            return Column(
+              children: [
+                Padding(
+                  padding: size.responsivePadding(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.network(
-                        'https://cdn.brandfetch.io/idyp519aAf/w/1024/h/1022/theme/dark/symbol.png?c=1bxid64Mup7aczewSAYMX&t=1721651819488',
-                        height: 80,
-                        width: 80,
-                      ),
-                      SizedBox(width: 16),
-                      Text(
-                        'Pokémon',
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  // Search Bar
-                  SizedBox(height: 16),
-                  PokemonSearchBar(
-                    controller: _searchController,
-                    hintText: 'Search favorites...',
-                    onSearch: (query) {
-                      _filterFavorites();
-                    },
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 8),
-            Expanded(
-              child: widget.favoritesController.isLoading
-                  ? Center(
-                      child: Column(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          CircularProgressIndicator(),
-                          SizedBox(height: 16),
+                          Image.network(
+                            'https://cdn.brandfetch.io/idyp519aAf/w/1024/h/1022/theme/dark/symbol.png?c=1bxid64Mup7aczewSAYMX&t=1721651819488',
+                            height: size.responsiveValue(
+                              mobile: AppSizes.logoMedium,
+                              tablet: AppSizes.logoMedium + 10,
+                              desktop: AppSizes.logoMedium,
+                            ),
+                            width: size.responsiveValue(
+                              mobile: AppSizes.logoMedium,
+                              tablet: AppSizes.logoMedium + 10,
+                              desktop: AppSizes.logoMedium,
+                            ),
+                          ),
+                          SizedBox(
+                            width: size.responsiveValue(
+                              mobile: AppSpacing.lg,
+                              tablet: AppSpacing.xl,
+                              desktop: AppSpacing.xxl,
+                            ),
+                          ),
                           Text(
-                            'Loading favorites...',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[600],
+                            'Pokémon',
+                            style: AppTextStyles.displayLarge.copyWith(
+                              fontSize: size.responsiveValue(
+                                mobile: AppTextStyles.fontSizeGiant,
+                                tablet: 30.0,
+                                desktop: 28.0,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    )
-                  : _filteredFavorites.isEmpty
+
+                      // Search Bar
+                      SizedBox(
+                        height: size.responsiveValue(
+                          mobile: AppSpacing.lg,
+                          tablet: AppSpacing.xxl,
+                          desktop: AppSpacing.xxl,
+                        ),
+                      ),
+                      PokemonSearchBar(
+                        controller: _searchController,
+                        hintText: 'Search favorites...',
+                        onSearch: (query) {
+                          _filterFavorites();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: size.responsiveValue(
+                    mobile: AppSpacing.sm,
+                    tablet: AppSpacing.lg,
+                    desktop: AppSpacing.lg,
+                  ),
+                ),
+                Expanded(
+                  child: widget.favoritesController.isLoading
                       ? Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
-                                Icons.favorite_border,
-                                size: 80,
-                                color: Colors.grey[400],
+                              const CircularProgressIndicator(),
+                              SizedBox(
+                                height: size.responsiveValue(
+                                  mobile: AppSpacing.lg,
+                                  tablet: AppSpacing.xxl,
+                                  desktop: AppSpacing.xxl,
+                                ),
                               ),
-                              SizedBox(height: 16),
                               Text(
-                                _searchController.text.isEmpty
-                                    ? 'No favorites yet'
-                                    : 'No favorites match your search',
-                                style: TextStyle(
-                                  fontSize: 18,
+                                'Loading favorites...',
+                                style: AppTextStyles.bodyMedium.copyWith(
                                   color: Colors.grey[600],
                                 ),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                _searchController.text.isEmpty
-                                    ? 'Add Pokémon to favorites from the home screen'
-                                    : 'Try a different search term',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[500],
-                                ),
-                                textAlign: TextAlign.center,
                               ),
                             ],
                           ),
                         )
-                      : GridView.builder(
-                          padding: EdgeInsets.symmetric(horizontal: 16.0),
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.85,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                          ),
-                          itemCount: _filteredFavorites.length,
-                          itemBuilder: (context, index) {
-                            final pokemon = _filteredFavorites[index];
-                            return PokemonCard(
-                              pokemon: pokemon,
-                              isFavorite: true,
-                              favoritesController: widget.favoritesController,
-                              onFavoriteToggle: () async {
-                                await widget.favoritesController.toggleFavorite(pokemon);
-                              },
-                            );
-                          },
-                        ),
-            ),
-          ],
+                      : _filteredFavorites.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.favorite_border,
+                                    size: size.responsiveValue(
+                                      mobile: AppSizes.iconXxl + 20,
+                                      tablet: 100.0,
+                                      desktop: 120.0,
+                                    ),
+                                    color: Colors.grey[400],
+                                  ),
+                                  SizedBox(
+                                    height: size.responsiveValue(
+                                      mobile: AppSpacing.lg,
+                                      tablet: AppSpacing.xxl,
+                                      desktop: AppSpacing.xxxl,
+                                    ),
+                                  ),
+                                  Text(
+                                    _searchController.text.isEmpty
+                                        ? 'No favorites yet'
+                                        : 'No favorites match your search',
+                                    style: AppTextStyles.bodyLarge.copyWith(
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: size.responsiveValue(
+                                      mobile: AppSpacing.sm,
+                                      tablet: AppSpacing.md,
+                                      desktop: AppSpacing.lg,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: size.responsiveHorizontalPadding(
+                                      mobile: 32.0,
+                                      tablet: 64.0,
+                                      desktop: 128.0,
+                                    ),
+                                    child: Text(
+                                      _searchController.text.isEmpty
+                                          ? 'Add Pokémon to favorites from the home screen'
+                                          : 'Try a different search term',
+                                      style: AppTextStyles.bodySmall.copyWith(
+                                        color: Colors.grey[500],
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Center(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: size.contentWidth,
+                                ),
+                                child: GridView.builder(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: size.responsiveValue(
+                                      mobile: AppSpacing.lg,
+                                      tablet: AppSpacing.xxl,
+                                      desktop: AppSpacing.xxxl,
+                                    ),
+                                  ),
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: size.gridColumns,
+                                    childAspectRatio: size.responsiveValue(
+                                      mobile: 0.85,
+                                      tablet: 0.80,
+                                      desktop: 0.75,
+                                    ),
+                                    crossAxisSpacing: size.responsiveValue(
+                                      mobile: AppSpacing.md,
+                                      tablet: AppSpacing.lg,
+                                      desktop: AppSpacing.xxl,
+                                    ),
+                                    mainAxisSpacing: size.responsiveValue(
+                                      mobile: AppSpacing.md,
+                                      tablet: AppSpacing.lg,
+                                      desktop: AppSpacing.xxl,
+                                    ),
+                                  ),
+                                  itemCount: _filteredFavorites.length,
+                                  itemBuilder: (context, index) {
+                                    final pokemon = _filteredFavorites[index];
+                                    return PokemonCard(
+                                      pokemon: pokemon,
+                                      isFavorite: true,
+                                      favoritesController:
+                                          widget.favoritesController,
+                                      onFavoriteToggle: () async {
+                                        await widget.favoritesController
+                                            .toggleFavorite(pokemon);
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

@@ -3,6 +3,10 @@ import 'package:pokedex_app/models/pokemon.dart';
 import 'package:pokedex_app/controllers/favorites_controller.dart';
 import 'package:pokedex_app/views/screens/details_screen.dart';
 import 'package:pokedex_app/views/widgets/favorite_button.dart';
+import 'package:pokedex_app/widgets/responsive/responsive_builder.dart';
+import 'package:pokedex_app/utils/constants/app_spacing.dart';
+import 'package:pokedex_app/utils/constants/app_sizes.dart';
+import 'package:pokedex_app/utils/constants/app_text_styles.dart';
 
 /// A card widget that displays Pokemon information
 class PokemonCard extends StatelessWidget {
@@ -26,6 +30,14 @@ class PokemonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = context.responsive;
+
+    final imageSize = size.responsiveValue(
+      mobile: AppSizes.pokemonImageMedium,
+      tablet: AppSizes.pokemonImageLarge,
+      desktop: AppSizes.pokemonImageLarge + 20,
+    );
+
     return GestureDetector(
       onTap: () {
         if (favoritesController != null) {
@@ -43,7 +55,13 @@ class PokemonCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.grey[200],
-          borderRadius: BorderRadius.circular(16.0),
+          borderRadius: BorderRadius.circular(
+            size.responsiveValue(
+              mobile: AppSizes.radiusLarge,
+              tablet: AppSizes.radiusExtraLarge,
+              desktop: AppSizes.radiusExtraLarge,
+            ),
+          ),
         ),
         child: Stack(
           children: [
@@ -56,38 +74,87 @@ class PokemonCard extends StatelessWidget {
                       tag: 'pokemon_${pokemon.id}',
                       child: Image.network(
                         pokemon.imageUrl!,
-                        width: 100,
-                        height: 100,
+                        width: imageSize,
+                        height: imageSize,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
-                          return const Icon(
+                          return Icon(
                             Icons.catching_pokemon,
-                            size: 100,
+                            size: imageSize,
                             color: Colors.grey,
                           );
                         },
                       ),
                     )
                   else
-                    const Icon(Icons.catching_pokemon, size: 100, color: Colors.grey),
-                  const SizedBox(height: 8),
-                  Text(
-                    pokemon.name[0].toUpperCase() + pokemon.name.substring(1),
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
+                    Icon(
+                      Icons.catching_pokemon,
+                      size: imageSize,
+                      color: Colors.grey,
+                    ),
+                  SizedBox(
+                    height: size.responsiveValue(
+                      mobile: AppSpacing.sm,
+                      tablet: AppSpacing.md,
+                      desktop: AppSpacing.md,
+                    ),
                   ),
-                  const SizedBox(height: 4),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: size.responsiveValue(
+                        mobile: AppSpacing.sm,
+                        tablet: AppSpacing.md,
+                        desktop: AppSpacing.lg,
+                      ),
+                    ),
+                    child: Text(
+                      pokemon.name[0].toUpperCase() + pokemon.name.substring(1),
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: size.responsiveValue(
+                          mobile: AppTextStyles.fontSizeXl,
+                          tablet: AppTextStyles.fontSizeXxl,
+                          desktop: AppTextStyles.fontSizeHuge,
+                        ),
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  SizedBox(
+                    height: size.responsiveValue(
+                      mobile: AppSpacing.xs,
+                      tablet: AppSpacing.sm,
+                      desktop: AppSpacing.sm,
+                    ),
+                  ),
                   Text(
                     _getPokemonId(),
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: Colors.grey[600],
+                      fontSize: size.responsiveValue(
+                        mobile: AppTextStyles.fontSizeMd,
+                        tablet: AppTextStyles.fontSizeLg,
+                        desktop: AppTextStyles.fontSizeLg,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
             if (onFavoriteToggle != null)
               Positioned(
-                top: 8,
-                right: 8,
+                top: size.responsiveValue(
+                  mobile: AppSpacing.sm,
+                  tablet: AppSpacing.md,
+                  desktop: AppSpacing.md,
+                ),
+                right: size.responsiveValue(
+                  mobile: AppSpacing.sm,
+                  tablet: AppSpacing.md,
+                  desktop: AppSpacing.md,
+                ),
                 child: FavoriteButton(
                   isFavorite: isFavorite,
                   onToggle: onFavoriteToggle!,
