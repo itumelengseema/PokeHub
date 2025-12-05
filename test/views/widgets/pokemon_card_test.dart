@@ -25,7 +25,8 @@ void main() {
     expect(find.byIcon(Icons.catching_pokemon), findsOneWidget);
   });
 
-  testWidgets('PokemonCard toggles favorite icon', (WidgetTester tester) async {
+  testWidgets('PokemonCard triggers favorite callback when tapped',
+      (WidgetTester tester) async {
     bool toggled = false;
     await tester.pumpWidget(
       MaterialApp(
@@ -33,7 +34,7 @@ void main() {
           body: PokemonCard(
             pokemon: testPokemon,
             isFavorite: false,
-            onFavoriteToggle: () {
+            onFavoriteToggle: () async {
               toggled = true;
             },
           ),
@@ -44,12 +45,15 @@ void main() {
     // Initially shows border icon
     expect(find.byIcon(Icons.favorite_border), findsOneWidget);
 
-    // Tap favorite icon (the one that's currently visible)
+    // Tap the favorite button
     await tester.tap(find.byIcon(Icons.favorite_border));
     await tester.pump();
 
     // Verify the callback was triggered
     expect(toggled, true);
+
+    // Complete all pending timers
+    await tester.pumpAndSettle(const Duration(seconds: 1));
   });
 
   testWidgets('DetailsScreen navigation on tap', (WidgetTester tester) async {

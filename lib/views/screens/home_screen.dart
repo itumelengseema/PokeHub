@@ -181,8 +181,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 isFavorite: widget.favoritesController
                                     .isFavorite(pokemon),
                                 favoritesController: widget.favoritesController,
-                                onFavoriteToggle: () {
-                                  widget.favoritesController.toggleFavorite(
+                                onFavoriteToggle: () async {
+                                  await widget.favoritesController.toggleFavorite(
                                     pokemon,
                                   );
                                 },

@@ -89,61 +89,78 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             ),
             SizedBox(height: 8),
             Expanded(
-              child: _filteredFavorites.isEmpty
+              child: widget.favoritesController.isLoading
                   ? Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.favorite_border,
-                            size: 80,
-                            color: Colors.grey[400],
-                          ),
+                          CircularProgressIndicator(),
                           SizedBox(height: 16),
                           Text(
-                            _searchController.text.isEmpty
-                                ? 'No favorites yet'
-                                : 'No favorites match your search',
+                            'Loading favorites...',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 16,
                               color: Colors.grey[600],
                             ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            _searchController.text.isEmpty
-                                ? 'Add Pokémon to favorites from the home screen'
-                                : 'Try a different search term',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[500],
-                            ),
-                            textAlign: TextAlign.center,
                           ),
                         ],
                       ),
                     )
-                  : GridView.builder(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.85,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                      ),
-                      itemCount: _filteredFavorites.length,
-                      itemBuilder: (context, index) {
-                        final pokemon = _filteredFavorites[index];
-                        return PokemonCard(
-                          pokemon: pokemon,
-                          isFavorite: true,
-                          favoritesController: widget.favoritesController,
-                          onFavoriteToggle: () {
-                            widget.favoritesController.toggleFavorite(pokemon);
+                  : _filteredFavorites.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.favorite_border,
+                                size: 80,
+                                color: Colors.grey[400],
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                _searchController.text.isEmpty
+                                    ? 'No favorites yet'
+                                    : 'No favorites match your search',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                _searchController.text.isEmpty
+                                    ? 'Add Pokémon to favorites from the home screen'
+                                    : 'Try a different search term',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[500],
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        )
+                      : GridView.builder(
+                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.85,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                          ),
+                          itemCount: _filteredFavorites.length,
+                          itemBuilder: (context, index) {
+                            final pokemon = _filteredFavorites[index];
+                            return PokemonCard(
+                              pokemon: pokemon,
+                              isFavorite: true,
+                              favoritesController: widget.favoritesController,
+                              onFavoriteToggle: () async {
+                                await widget.favoritesController.toggleFavorite(pokemon);
+                              },
+                            );
                           },
-                        );
-                      },
-                    ),
+                        ),
             ),
           ],
         ),
