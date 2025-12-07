@@ -1,70 +1,55 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:pokedex_app/controllers/favorites_controller.dart';
-import 'package:pokedex_app/controllers/theme_controller.dart';
+import 'package:pokedex_app/presentation/viewmodels/theme_viewmodel.dart';
+import 'package:pokedex_app/presentation/viewmodels/favorites_viewmodel.dart';
+import 'package:pokedex_app/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:pokedex_app/core/theme/app_theme_data.dart';
 import 'package:pokedex_app/firebase_options.dart';
-import 'package:pokedex_app/services/favorites_service.dart';
-import 'package:pokedex_app/views/screens/home_screen.dart';
-import 'package:pokedex_app/views/screens/favorites_screen.dart';
-import 'package:pokedex_app/views/screens/profile_screen.dart';
-import 'package:pokedex_app/views/screens/auth_wrapper.dart';
+import 'package:pokedex_app/presentation/screens/home_screen.dart';
+import 'package:pokedex_app/presentation/screens/favorites_screen.dart';
+import 'package:pokedex_app/presentation/screens/profile_screen.dart';
+import 'package:pokedex_app/presentation/screens/auth_wrapper.dart';
+import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (Firebase.apps.isEmpty) { // this will prevent re-initialization error
+  if (Firebase.apps.isEmpty) {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   }
 
-
-  // FlutterNativeSplash.preserve(
-  //   widgetsBinding: WidgetsFlutterBinding.ensureInitialized(),
-  // );
-  runApp(MainApp());
+  runApp(const MainApp());
 }
 
-class MainApp extends StatefulWidget {
+class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
   @override
-  State<MainApp> createState() => _MainAppState();
-}
-
-class _MainAppState extends State<MainApp> {
-  final ThemeController _themeController = ThemeController();
-
-  @override
-  void dispose() {
-    _themeController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-
-    return ValueListenableBuilder(
-      valueListenable: _themeController.themeNotifier,
-      builder: (context, theme, child) {
-        return MaterialApp(
-          title: 'Pokedex',
-          debugShowCheckedModeBanner: false,
-          themeMode: theme.themeMode,
-          theme: AppThemeData.lightTheme,
-          darkTheme: AppThemeData.darkTheme,
-          home: child,
-        );
-      },
-      child: AuthWrapper(themeController: _themeController),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeViewModel()),
+        ChangeNotifierProvider(create: (_) => AuthViewModel()),
+        ChangeNotifierProvider(create: (_) => FavoritesViewModel()),
+      ],
+      child: Consumer<ThemeViewModel>(
+        builder: (context, themeViewModel, child) {
+          return MaterialApp(
+            title: 'Pokedex',
+            debugShowCheckedModeBanner: false,
+            themeMode: themeViewModel.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+            theme: AppThemeData.lightTheme,
+            darkTheme: AppThemeData.darkTheme,
+            home: const AuthWrapper(),
+          );
+        },
+      ),
     );
   }
 }
 
 class HomeWrapper extends StatefulWidget {
-  final ThemeController themeController;
-
-  const HomeWrapper({super.key, required this.themeController});
+  const HomeWrapper({super.key});
 
   @override
   State<HomeWrapper> createState() => _HomeWrapperState();
@@ -72,40 +57,33 @@ class HomeWrapper extends StatefulWidget {
 
 class _HomeWrapperState extends State<HomeWrapper> {
   int currentPage = 0;
-  late final FavoritesController _favoritesController;
   User? _currentUser;
 
   @override
   void initState() {
     super.initState();
     _currentUser = FirebaseAuth.instance.currentUser;
-    _favoritesController = FavoritesController(FavoritesService());
 
-    // Listen to auth state changes
+    // Listen to auth state changes and reload favorites
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user == null && _currentUser != null) {
-        // User signed out, clear favorites
-        _favoritesController.clearFavorites();
+        // User signed out - favorites will auto-update via stream
       } else if (user != null && _currentUser?.uid != user.uid) {
-        // User signed in or switched, reload favorites
-        _favoritesController.reloadFavorites();
+        // User signed in or switched - favorites will auto-update via stream
+        if (mounted) {
+          context.read<FavoritesViewModel>().loadFavorites();
+        }
       }
       _currentUser = user;
     });
   }
 
   @override
-  void dispose() {
-    _favoritesController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final screens = [
-      HomeScreen(favoritesController: _favoritesController),
-      FavoritesScreen(favoritesController: _favoritesController),
-      ProfileScreen(themeController: widget.themeController),
+      const HomeScreen(),
+      const FavoritesScreen(),
+      const ProfileScreen(),
     ];
 
     return Scaffold(
@@ -117,7 +95,7 @@ class _HomeWrapperState extends State<HomeWrapper> {
           });
         },
         selectedIndex: currentPage,
-        destinations: [
+        destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
           NavigationDestination(icon: Icon(Icons.favorite), label: 'Favorites'),
           NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
