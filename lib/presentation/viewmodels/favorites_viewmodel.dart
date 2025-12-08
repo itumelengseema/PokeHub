@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:pokedex_app/data/models/pokemon_model.dart';
 import 'package:pokedex_app/data/repositories/favorites_repository.dart';
@@ -6,6 +7,7 @@ enum FavoritesViewState { initial, loading, loaded, error }
 
 class FavoritesViewModel extends ChangeNotifier {
   final FavoritesRepository _favoritesRepository;
+  StreamSubscription<List<Pokemon>>? _favoritesSubscription;
 
   FavoritesViewModel({FavoritesRepository? favoritesRepository})
       : _favoritesRepository = favoritesRepository ?? FavoritesRepository() {
@@ -29,7 +31,10 @@ class FavoritesViewModel extends ChangeNotifier {
 
   // Listen to favorites stream
   void _listenToFavorites() {
-    _favoritesRepository.favoritesStream().listen(
+    // Cancel existing subscription if any
+    _favoritesSubscription?.cancel();
+
+    _favoritesSubscription = _favoritesRepository.favoritesStream().listen(
       (favorites) {
         _allFavorites = favorites;
         _applyFilters();
@@ -44,6 +49,17 @@ class FavoritesViewModel extends ChangeNotifier {
         notifyListeners();
       },
     );
+  }
+
+  // Reinitialize favorites for new user
+  void reinitialize() {
+    _allFavorites = [];
+    _filteredFavorites = [];
+    _searchQuery = '';
+    _errorMessage = null;
+    _state = FavoritesViewState.initial;
+    _listenToFavorites();
+    notifyListeners();
   }
 
   // Load favorites
@@ -132,5 +148,11 @@ class FavoritesViewModel extends ChangeNotifier {
     _searchQuery = '';
     _applyFilters();
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _favoritesSubscription?.cancel();
+    super.dispose();
   }
 }

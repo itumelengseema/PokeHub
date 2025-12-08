@@ -64,14 +64,17 @@ class _HomeWrapperState extends State<HomeWrapper> {
     super.initState();
     _currentUser = FirebaseAuth.instance.currentUser;
 
-    // Listen to auth state changes and reload favorites
+    // Listen to auth state changes and reinitialize favorites
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user == null && _currentUser != null) {
-        // User signed out - favorites will auto-update via stream
-      } else if (user != null && _currentUser?.uid != user.uid) {
-        // User signed in or switched - favorites will auto-update via stream
+        // User signed out - reinitialize to clear favorites
         if (mounted) {
-          context.read<FavoritesViewModel>().loadFavorites();
+          context.read<FavoritesViewModel>().reinitialize();
+        }
+      } else if (user != null && _currentUser?.uid != user.uid) {
+        // User signed in or switched - reinitialize for new user
+        if (mounted) {
+          context.read<FavoritesViewModel>().reinitialize();
         }
       }
       _currentUser = user;
